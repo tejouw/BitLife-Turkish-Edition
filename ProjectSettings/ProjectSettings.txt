@@ -1,0 +1,50 @@
+BitLife Turkish Edition - Unity Project Settings
+
+Bu dosya Unity Editor tarafından otomatik oluşturulacak ayarları içerir.
+Aşağıdaki ayarlar Unity'de manuel olarak yapılmalıdır:
+
+=== Player Settings ===
+Company Name: BitLifeTR
+Product Name: BitLife Türkiye
+Version: 1.0.0
+Default Icon: [Oyun ikonu]
+
+=== Android Settings ===
+Package Name: com.bitlifetr.game
+Minimum API Level: 21 (Android 5.0 Lollipop)
+Target API Level: 33 (Android 13)
+Scripting Backend: IL2CPP
+Target Architectures: ARMv7, ARM64
+
+=== Quality Settings ===
+Default Quality: Medium
+VSync: Every V Blank
+Anti Aliasing: 2x Multi Sampling
+
+=== Graphics Settings ===
+Color Space: Gamma (Android için)
+Auto Graphics API: true
+
+=== Build Settings ===
+Scenes in Build:
+  0: Scenes/MainScene
+
+=== Input Settings ===
+Mobile Input: Auto
+
+=== TextMeshPro Settings ===
+- Turkish Font Asset oluştur (Türkçe karakterler için)
+- Default Font Size: 36
+
+=== Assembly Definitions ===
+BitLifeTR.Core
+BitLifeTR.UI
+BitLifeTR.Data
+BitLifeTR.Systems
+BitLifeTR.Localization
+BitLifeTR.Utils
+
+=== Notlar ===
+- Unity 2022.3 LTS kullanılması önerilir
+- IL2CPP build için NDK gerekli
+- Keystore oluşturulmalı (release build için)

@@ -1,0 +1,265 @@
+{
+  "events": [
+    {
+      "id": "wedding_invite",
+      "title": "Düğün Daveti",
+      "description": "Akrabanın düğününe davet edildin.",
+      "category": "Social",
+      "minAge": 10,
+      "maxAge": 120,
+      "probability": 0.15,
+      "choices": [
+        {
+          "text": "Düğüne git",
+          "outcomes": [
+            {
+              "statChanges": {
+                "Happiness": 8,
+                "Money": -500,
+                "Karma": 3
+              }
+            }
+          ]
+        },
+        {
+          "text": "Mazeret uydur",
+          "outcomes": [
+            {
+              "statChanges": {
+                "Happiness": -3,
+                "Karma": -5
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "traffic_jam",
+      "title": "Trafik",
+      "description": "İstanbul trafiğine yakalandın!",
+      "category": "Random",
+      "minAge": 18,
+      "maxAge": 120,
+      "probability": 0.25,
+      "choices": [
+        {
+          "text": "Sabırla bekle",
+          "outcomes": [
+            {
+              "statChanges": {
+                "Happiness": -5
+              }
+            }
+          ]
+        },
+        {
+          "text": "Alternatif yol ara",
+          "outcomes": [
+            {
+              "statChanges": {
+                "Intelligence": 1,
+                "Happiness": -2
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "simit_seller",
+      "title": "Simitçi",
+      "description": "Sokakta bir simitçi gördün.",
+      "category": "Random",
+      "minAge": 5,
+      "maxAge": 120,
+      "probability": 0.2,
+      "choices": [
+        {
+          "text": "Simit al",
+          "outcomes": [
+            {
+              "statChanges": {
+                "Happiness": 5,
+                "Money": -10
+              }
+            }
+          ]
+        },
+        {
+          "text": "Geç",
+          "outcomes": [
+            {
+              "statChanges": {
+                "Happiness": -1
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "earthquake_drill",
+      "title": "Deprem Tatbikatı",
+      "description": "Okulda/işyerinde deprem tatbikatı yapılıyor.",
+      "category": "Random",
+      "minAge": 6,
+      "maxAge": 65,
+      "probability": 0.1,
+      "choices": [
+        {
+          "text": "Ciddiye al",
+          "outcomes": [
+            {
+              "statChanges": {
+                "Intelligence": 2,
+                "Karma": 2
+              }
+            }
+          ]
+        },
+        {
+          "text": "Şaka yap",
+          "outcomes": [
+            {
+              "statChanges": {
+                "Happiness": 3,
+                "Karma": -3
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tea_offer",
+      "title": "Çay İkramı",
+      "description": "Komşun seni çaya davet etti.",
+      "category": "Social",
+      "minAge": 15,
+      "maxAge": 120,
+      "probability": 0.2,
+      "choices": [
+        {
+          "text": "Kabul et",
+          "outcomes": [
+            {
+              "statChanges": {
+                "Happiness": 6,
+                "Karma": 3
+              }
+            }
+          ]
+        },
+        {
+          "text": "Meşgulüm de",
+          "outcomes": [
+            {
+              "statChanges": {
+                "Karma": -2
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "street_cat",
+      "title": "Sokak Kedisi",
+      "description": "Aç bir sokak kedisi gördün.",
+      "category": "Random",
+      "minAge": 3,
+      "maxAge": 120,
+      "probability": 0.15,
+      "choices": [
+        {
+          "text": "Yiyecek ver",
+          "outcomes": [
+            {
+              "statChanges": {
+                "Happiness": 8,
+                "Karma": 10,
+                "Money": -20
+              }
+            }
+          ]
+        },
+        {
+          "text": "Görmezden gel",
+          "outcomes": [
+            {
+              "statChanges": {
+                "Karma": -3
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mother_call",
+      "title": "Anne Aradı",
+      "description": "Annen neden aramadığını soruyor.",
+      "category": "Social",
+      "minAge": 18,
+      "maxAge": 120,
+      "probability": 0.3,
+      "choices": [
+        {
+          "text": "Özür dile, uzun uzun konuş",
+          "outcomes": [
+            {
+              "statChanges": {
+                "Happiness": 5,
+                "Karma": 5
+              }
+            }
+          ]
+        },
+        {
+          "text": "Meşgulüm deyip kapat",
+          "outcomes": [
+            {
+              "statChanges": {
+                "Happiness": -3,
+                "Karma": -5
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "inflation_news",
+      "title": "Enflasyon Haberi",
+      "description": "Fiyatlar yine arttı!",
+      "category": "Financial",
+      "minAge": 18,
+      "maxAge": 120,
+      "probability": 0.35,
+      "choices": [
+        {
+          "text": "Bütçeni sık",
+          "outcomes": [
+            {
+              "statChanges": {
+                "Happiness": -5,
+                "Intelligence": 2
+              }
+            }
+          ]
+        },
+        {
+          "text": "Aldırma",
+          "outcomes": [
+            {
+              "statChanges": {
+                "Money": -200
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
