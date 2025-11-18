@@ -44,6 +44,9 @@ namespace BitLifeTR.Core
             // 5. Event Manager - handles game events
             root.AddComponent<EventManager>();
 
+            // 6. Game Loop - handles year progression
+            root.AddComponent<GameLoop>();
+
             // All core managers initialized
 
             Debug.Log("[Bootstrap] Core managers initialized");
