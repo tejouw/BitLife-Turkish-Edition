@@ -1,5 +1,6 @@
 using UnityEngine;
 using BitLifeTR.UI;
+using BitLifeTR.Systems;
 
 namespace BitLifeTR.Core
 {
@@ -34,8 +35,13 @@ namespace BitLifeTR.Core
             // 2. UI Manager - handles all UI
             root.AddComponent<UIManager>();
 
+            // 3. Save Manager - handles save/load
+            root.AddComponent<SaveManager>();
+
+            // 4. Character Manager - handles character state
+            root.AddComponent<CharacterManager>();
+
             // Note: Other managers will be added in subsequent phases
-            // - SaveManager (Phase 3)
             // - EventManager (Phase 4)
             // - etc.
 
