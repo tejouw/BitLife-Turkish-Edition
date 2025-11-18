@@ -41,9 +41,10 @@ namespace BitLifeTR.Core
             // 4. Character Manager - handles character state
             root.AddComponent<CharacterManager>();
 
-            // Note: Other managers will be added in subsequent phases
-            // - EventManager (Phase 4)
-            // - etc.
+            // 5. Event Manager - handles game events
+            root.AddComponent<EventManager>();
+
+            // All core managers initialized
 
             Debug.Log("[Bootstrap] Core managers initialized");
         }
