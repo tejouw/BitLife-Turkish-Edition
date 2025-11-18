@@ -1,6 +1,7 @@
 using UnityEngine;
 using BitLifeTR.UI;
 using BitLifeTR.Systems;
+using BitLifeTR.Data;
 
 namespace BitLifeTR.Core
 {
@@ -57,6 +58,9 @@ namespace BitLifeTR.Core
         {
             Debug.Log("[Bootstrap] Post-initialization...");
 
+            // Load all game events
+            LoadGameContent();
+
             // Start the game at main menu
             if (GameManager.HasInstance)
             {
@@ -64,6 +68,15 @@ namespace BitLifeTR.Core
             }
 
             Debug.Log("[Bootstrap] Game ready");
+        }
+
+        private static void LoadGameContent()
+        {
+            // Register all events from database
+            var events = EventDatabase.GetAllEvents();
+            EventManager.Instance.RegisterEvents(events);
+
+            Debug.Log($"[Bootstrap] Loaded {events.Count} events");
         }
     }
 }
