@@ -1,5 +1,6 @@
 using UnityEngine;
 using BitLifeTR.UI;
+using BitLifeTR.UI.Screens;
 using BitLifeTR.Systems;
 using BitLifeTR.Data;
 
@@ -77,6 +78,26 @@ namespace BitLifeTR.Core
             EventManager.Instance.RegisterEvents(events);
 
             Debug.Log($"[Bootstrap] Loaded {events.Count} events");
+
+            // Create all UI screens
+            CreateScreens();
+        }
+
+        private static void CreateScreens()
+        {
+            // Create all screens
+            UIManager.Instance.CreateScreen<MainMenuScreen>();
+            UIManager.Instance.CreateScreen<CharacterCreationScreen>();
+            UIManager.Instance.CreateScreen<GameScreen>();
+            UIManager.Instance.CreateScreen<ActivitiesScreen>();
+            UIManager.Instance.CreateScreen<RelationshipsScreen>();
+            UIManager.Instance.CreateScreen<SettingsScreen>();
+            UIManager.Instance.CreateScreen<DeathScreen>();
+
+            // Show main menu as default
+            UIManager.Instance.SetRootScreen<MainMenuScreen>();
+
+            Debug.Log("[Bootstrap] UI screens created");
         }
     }
 }
