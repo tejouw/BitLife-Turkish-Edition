@@ -1,4 +1,5 @@
 using UnityEngine;
+using BitLifeTR.UI;
 
 namespace BitLifeTR.Core
 {
@@ -28,10 +29,12 @@ namespace BitLifeTR.Core
             // Core managers - order matters!
 
             // 1. Game Manager - main game control
-            var gameManager = root.AddComponent<GameManager>();
+            root.AddComponent<GameManager>();
+
+            // 2. UI Manager - handles all UI
+            root.AddComponent<UIManager>();
 
             // Note: Other managers will be added in subsequent phases
-            // - UIManager (Phase 2)
             // - SaveManager (Phase 3)
             // - EventManager (Phase 4)
             // - etc.
