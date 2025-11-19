@@ -45,6 +45,9 @@ namespace BitLifeTR.Data
         // Askerlik
         public MilitaryData Military;
 
+        // Evcil hayvanlar
+        public List<PetData> Pets;
+
         public CharacterData()
         {
             Id = Guid.NewGuid().ToString();
@@ -57,6 +60,7 @@ namespace BitLifeTR.Data
             Legal = new LegalData();
             LifeEvents = new List<string>();
             Military = new MilitaryData();
+            Pets = new List<PetData>();
         }
 
         public CharacterData(string name, Gender gender) : this()
@@ -412,5 +416,84 @@ namespace BitLifeTR.Data
         public int MonthsRemaining;
         public string Rank;
         public bool IsPaidService; // Bedelli
+    }
+
+    /// <summary>
+    /// Evcil hayvan verisi
+    /// </summary>
+    [Serializable]
+    public class PetData
+    {
+        public string Id;
+        public string Name;
+        public PetType Type;
+        public PetCategory Category;
+        public int Age;
+        public float Health;
+        public float Happiness;
+        public float RelationshipLevel;
+        public bool IsAlive;
+        public int YearAdopted;
+
+        public PetData()
+        {
+            Id = Guid.NewGuid().ToString();
+            Health = 100f;
+            Happiness = 100f;
+            RelationshipLevel = 50f;
+            IsAlive = true;
+        }
+
+        public PetData(string name, PetType type) : this()
+        {
+            Name = name;
+            Type = type;
+            Age = 0;
+            Category = GetCategoryForType(type);
+        }
+
+        private PetCategory GetCategoryForType(PetType type)
+        {
+            return type switch
+            {
+                PetType.Fish => PetCategory.Aquatic,
+                PetType.Turtle => PetCategory.Aquatic,
+                PetType.Parrot => PetCategory.Exotic,
+                PetType.Rabbit => PetCategory.Exotic,
+                _ => PetCategory.Common
+            };
+        }
+
+        public int GetMaxAge()
+        {
+            return Type switch
+            {
+                PetType.Dog => 15,
+                PetType.Cat => 20,
+                PetType.Bird => 10,
+                PetType.Fish => 5,
+                PetType.Hamster => 3,
+                PetType.Rabbit => 12,
+                PetType.Turtle => 50,
+                PetType.Parrot => 30,
+                _ => 10
+            };
+        }
+
+        public string GetTypeName()
+        {
+            return Type switch
+            {
+                PetType.Dog => "Köpek",
+                PetType.Cat => "Kedi",
+                PetType.Bird => "Kuş",
+                PetType.Fish => "Balık",
+                PetType.Hamster => "Hamster",
+                PetType.Rabbit => "Tavşan",
+                PetType.Turtle => "Kaplumbağa",
+                PetType.Parrot => "Papağan",
+                _ => "Hayvan"
+            };
+        }
     }
 }

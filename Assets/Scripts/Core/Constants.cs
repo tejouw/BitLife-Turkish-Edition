@@ -90,7 +90,8 @@ namespace BitLifeTR.Core
         Assets,
         Settings,
         GameOver,
-        Event
+        Event,
+        Pets
     }
 
     /// <summary>
@@ -228,5 +229,30 @@ namespace BitLifeTR.Core
         Shopping,       // Alışveriş
         Gambling,       // Kumar
         Volunteer       // Gönüllülük
+    }
+
+    /// <summary>
+    /// Evcil hayvan tipleri
+    /// </summary>
+    public enum PetType
+    {
+        Dog,            // Köpek
+        Cat,            // Kedi
+        Bird,           // Kuş
+        Fish,           // Balık
+        Hamster,        // Hamster
+        Rabbit,         // Tavşan
+        Turtle,         // Kaplumbağa
+        Parrot          // Papağan
+    }
+
+    /// <summary>
+    /// Evcil hayvan kategorileri
+    /// </summary>
+    public enum PetCategory
+    {
+        Common,         // Yaygın
+        Exotic,         // Egzotik
+        Aquatic         // Su hayvanı
     }
 }

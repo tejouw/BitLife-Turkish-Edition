@@ -37,6 +37,7 @@ namespace BitLifeTR.Core
         public HealthSystem HealthSystem { get; private set; }
         public CrimeSystem CrimeSystem { get; private set; }
         public EconomySystem EconomySystem { get; private set; }
+        public PetSystem PetSystem { get; private set; }
 
         // Oyun durumu
         public CharacterData CurrentCharacter { get; private set; }
@@ -71,6 +72,7 @@ namespace BitLifeTR.Core
             HealthSystem = gameObject.AddComponent<HealthSystem>();
             CrimeSystem = gameObject.AddComponent<CrimeSystem>();
             EconomySystem = gameObject.AddComponent<EconomySystem>();
+            PetSystem = gameObject.AddComponent<PetSystem>();
 
             Debug.Log("BitLife TR: Tüm sistemler başlatıldı");
         }
@@ -157,6 +159,9 @@ namespace BitLifeTR.Core
 
             // Ekonomi güncelle
             EconomySystem.ProcessYearlyEconomy(CurrentCharacter);
+
+            // Evcil hayvanları güncelle
+            PetSystem.ProcessYearlyPets(CurrentCharacter);
 
             // Ölüm kontrolü
             if (CurrentCharacter.Stats.Health <= 0)
