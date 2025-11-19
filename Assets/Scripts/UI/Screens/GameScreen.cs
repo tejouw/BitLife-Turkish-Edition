@@ -156,7 +156,7 @@ namespace BitLifeTR.UI
             // Nav butonları
             CreateNavButton("İş", navPanel.transform, ScreenType.Career);
             CreateNavButton("İlişki", navPanel.transform, ScreenType.Relationships);
-            CreateNavButton("Stat", navPanel.transform, ScreenType.Stats);
+            CreateNavButton("Hayvan", navPanel.transform, ScreenType.Pets);
             CreateNavButton("Varlık", navPanel.transform, ScreenType.Assets);
             CreateNavButton("Menü", navPanel.transform, ScreenType.Settings);
         }
