@@ -10,6 +10,13 @@ Tamamen Türkçe ve Türk kültürüne uyarlanmış metin tabanlı hayat simüla
 - **Olay Sistemi**: Yüzlerce Türkçe olay ve karar ağacı
 - **Kaydet/Yükle**: Otomatik ve manuel kaydetme
 
+### Evcil Hayvan Sistemi
+- **Hayvan Türleri**: Köpek, Kedi, Kuş, Balık, Hamster, Tavşan, Kaplumbağa, Papağan
+- **Bakım Aksiyonları**: Oyna, Besle, Veteriner ziyareti
+- **Hayvan Statları**: Sağlık, Mutluluk, İlişki seviyesi
+- **Yaşlanma ve Ölüm**: Gerçekçi yaş bazlı ölüm olasılığı
+- **Türkçe İsimler**: Karabaş, Pamuk, Minnoş, Tekir ve daha fazlası
+
 ### Türkiye'ye Özgü İçerikler
 - **Eğitim**: İlkokul, Ortaokul, Lise, YKS Sınavı, Üniversite, Yüksek Lisans, Doktora
 - **Meslekler**: Devlet Memuru, Doktor, Avukat, Mühendis, Esnaf, YouTuber, Futbolcu ve daha fazlası
