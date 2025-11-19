@@ -38,6 +38,7 @@ namespace BitLifeTR.Core
         public CrimeSystem CrimeSystem { get; private set; }
         public EconomySystem EconomySystem { get; private set; }
         public PetSystem PetSystem { get; private set; }
+        public LegacySystem LegacySystem { get; private set; }
 
         // Oyun durumu
         public CharacterData CurrentCharacter { get; private set; }
@@ -73,6 +74,7 @@ namespace BitLifeTR.Core
             CrimeSystem = gameObject.AddComponent<CrimeSystem>();
             EconomySystem = gameObject.AddComponent<EconomySystem>();
             PetSystem = gameObject.AddComponent<PetSystem>();
+            LegacySystem = gameObject.AddComponent<LegacySystem>();
 
             Debug.Log("BitLife TR: Tüm sistemler başlatıldı");
         }
@@ -133,10 +135,44 @@ namespace BitLifeTR.Core
         public void EndGame(DeathReason reason)
         {
             IsGameRunning = false;
-            EventBus.Publish(new GameEndedEvent(CurrentCharacter, reason));
-            UIManager.ShowScreen(ScreenType.GameOver);
 
+            // Çocuk varsa nesil geçişi seçeneği sun
+            var eligibleChildren = LegacySystem.GetEligibleChildren(CurrentCharacter);
+
+            EventBus.Publish(new GameEndedEvent(CurrentCharacter, reason));
+
+            if (eligibleChildren.Count > 0)
+            {
+                // Nesil geçişi ekranını göster
+                EventBus.Publish(new LegacyTransitionEvent(CurrentCharacter, eligibleChildren, reason));
+            }
+
+            UIManager.ShowScreen(ScreenType.GameOver);
             Debug.Log($"Oyun sona erdi: {reason}");
+        }
+
+        /// <summary>
+        /// Çocuk olarak devam et
+        /// </summary>
+        public void ContinueAsChild(Data.RelationshipData selectedChild, DeathReason previousDeathReason)
+        {
+            if (CurrentCharacter == null) return;
+
+            // Yeni karakteri oluştur
+            var newCharacter = LegacySystem.ContinueAsChild(CurrentCharacter, selectedChild, previousDeathReason);
+
+            // Karakteri değiştir
+            CurrentCharacter = newCharacter;
+            IsGameRunning = true;
+            IsPaused = false;
+
+            // Event yayınla
+            EventBus.Publish(new GenerationChangedEvent(newCharacter));
+
+            // Oyun ekranına dön
+            UIManager.ShowScreen(ScreenType.Game);
+
+            Debug.Log($"Nesil geçişi: {newCharacter.Name} {newCharacter.Surname} (Nesil {newCharacter.Legacy.Generation})");
         }
 
         public void AdvanceYear()
@@ -228,5 +264,25 @@ namespace BitLifeTR.Core
     {
         public CharacterData Character { get; }
         public YearAdvancedEvent(CharacterData character) => Character = character;
+    }
+
+    public class LegacyTransitionEvent
+    {
+        public CharacterData DeceasedCharacter { get; }
+        public System.Collections.Generic.List<Data.RelationshipData> EligibleChildren { get; }
+        public DeathReason DeathReason { get; }
+
+        public LegacyTransitionEvent(CharacterData deceased, System.Collections.Generic.List<Data.RelationshipData> children, DeathReason reason)
+        {
+            DeceasedCharacter = deceased;
+            EligibleChildren = children;
+            DeathReason = reason;
+        }
+    }
+
+    public class GenerationChangedEvent
+    {
+        public CharacterData NewCharacter { get; }
+        public GenerationChangedEvent(CharacterData character) => NewCharacter = character;
     }
 }

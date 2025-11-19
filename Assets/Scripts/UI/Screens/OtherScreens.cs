@@ -264,20 +264,152 @@ namespace BitLifeTR.UI
     /// </summary>
     public class GameOverScreen : BaseScreen
     {
+        private Transform contentParent;
+        private System.Collections.Generic.List<RelationshipData> eligibleChildren;
+        private DeathReason deathReason;
+
         public GameOverScreen(UIManager manager) : base(manager) { }
 
         protected override void Initialize()
         {
             rootObject = uiManager.PanelFactory.Create("GameOver", null, null, new Color(0.05f, 0.05f, 0.08f, 1f));
 
-            var titleText = uiManager.TextFactory.Create("Hayatın Sona Erdi", rootObject.transform, 42, new Color(0.8f, 0.2f, 0.2f));
-            titleText.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 300);
+            // Event dinleyicisi ekle
+            EventBus.Subscribe<LegacyTransitionEvent>(OnLegacyTransition);
+        }
 
+        private void OnLegacyTransition(LegacyTransitionEvent evt)
+        {
+            eligibleChildren = evt.EligibleChildren;
+            deathReason = evt.DeathReason;
+        }
+
+        public override void Show()
+        {
+            base.Show();
+            Refresh();
+        }
+
+        public override void Refresh()
+        {
+            // Eski içeriği temizle
+            foreach (Transform child in rootObject.transform)
+            {
+                GameObject.Destroy(child.gameObject);
+            }
+
+            var character = GameManager.Instance.CurrentCharacter;
+            if (character == null) return;
+
+            // Başlık
+            var titleText = uiManager.TextFactory.Create("Hayatın Sona Erdi", rootObject.transform, 42, new Color(0.8f, 0.2f, 0.2f));
+            titleText.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 350);
+
+            // Karakter bilgisi
+            var nameText = uiManager.TextFactory.Create($"{character.Name} {character.Surname}", rootObject.transform, 28, Color.white);
+            nameText.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 280);
+
+            var ageText = uiManager.TextFactory.Create($"{character.BirthYear} - {character.BirthYear + character.Age} ({character.Age} yaşında)", rootObject.transform, 20, new Color(0.7f, 0.7f, 0.7f));
+            ageText.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 240);
+
+            // Net servet
+            float netWorth = GameManager.Instance.LegacySystem.CalculateNetWorth(character);
+            var worthText = uiManager.TextFactory.Create($"Net Servet: ₺{netWorth:N0}", rootObject.transform, 22, new Color(0.3f, 0.8f, 0.3f));
+            worthText.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 190);
+
+            // Nesil bilgisi
+            var genText = uiManager.TextFactory.Create($"Nesil: {character.Legacy.Generation}", rootObject.transform, 18, new Color(0.6f, 0.6f, 0.8f));
+            genText.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 150);
+
+            float buttonY = 50;
+
+            // Çocuk varsa devam seçeneği göster
+            if (eligibleChildren != null && eligibleChildren.Count > 0)
+            {
+                var continueLabel = uiManager.TextFactory.Create("Çocuklarından biri olarak devam et:", rootObject.transform, 18, new Color(0.8f, 0.8f, 0.5f));
+                continueLabel.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, buttonY);
+                buttonY -= 40;
+
+                foreach (var child in eligibleChildren)
+                {
+                    string childInfo = $"{child.Name} ({child.Age} yaş)";
+                    RelationshipData capturedChild = child;
+
+                    var childBtn = uiManager.ButtonFactory.Create(childInfo, rootObject.transform, () =>
+                    {
+                        GameManager.Instance.ContinueAsChild(capturedChild, deathReason);
+                    }, new Vector2(250, 45), new Color(0.3f, 0.6f, 0.4f));
+                    childBtn.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, buttonY);
+                    buttonY -= 55;
+                }
+
+                buttonY -= 20;
+            }
+
+            // Aile geçmişi butonu
+            if (character.Legacy.Ancestors.Count > 0)
+            {
+                var historyBtn = uiManager.ButtonFactory.Create("Aile Geçmişi", rootObject.transform, () =>
+                {
+                    ShowFamilyHistory(character);
+                }, new Vector2(200, 45), new Color(0.4f, 0.4f, 0.6f));
+                historyBtn.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, buttonY);
+                buttonY -= 55;
+            }
+
+            // Yeni oyun butonu
+            var newGameBtn = uiManager.ButtonFactory.Create("Yeni Oyun", rootObject.transform, () =>
+            {
+                uiManager.ShowScreen(ScreenType.NewGame);
+            }, new Vector2(200, 45), new Color(0.3f, 0.5f, 0.7f));
+            newGameBtn.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, buttonY);
+            buttonY -= 55;
+
+            // Ana menü butonu
             var menuBtn = uiManager.ButtonFactory.Create("Ana Menü", rootObject.transform, () =>
             {
                 GameManager.Instance.ReturnToMainMenu();
-            }, new Vector2(200, 50), new Color(0.5f, 0.5f, 0.5f));
-            menuBtn.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -200);
+            }, new Vector2(200, 45), new Color(0.5f, 0.3f, 0.3f));
+            menuBtn.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, buttonY);
+        }
+
+        private void ShowFamilyHistory(CharacterData character)
+        {
+            var popup = uiManager.PanelFactory.Create("FamilyHistory", new Vector2(700, 800));
+            popup.GetComponent<UnityEngine.UI.Image>().color = new Color(0.1f, 0.1f, 0.15f, 0.98f);
+
+            var title = uiManager.TextFactory.Create($"{character.Surname} Ailesi Geçmişi", popup.transform, 28, Color.white);
+            title.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 350);
+
+            // Scroll view
+            var scrollView = uiManager.ScrollViewFactory.Create("HistoryScroll", popup.transform, new Vector2(650, 550));
+            scrollView.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -30);
+            var content = uiManager.ScrollViewFactory.GetContent(scrollView);
+
+            // Ataları listele
+            foreach (var ancestor in character.Legacy.Ancestors)
+            {
+                var panel = uiManager.PanelFactory.CreateWithLayout("Ancestor", new Vector2(600, 120), content, true, 5);
+                panel.GetComponent<UnityEngine.UI.Image>().color = new Color(0.2f, 0.2f, 0.25f, 0.9f);
+
+                uiManager.TextFactory.Create($"{ancestor.Name} {ancestor.Surname}", panel.transform, 20, Color.white);
+                uiManager.TextFactory.Create($"{ancestor.BirthYear} - {ancestor.DeathYear} ({ancestor.DeathAge} yaş)", panel.transform, 16, new Color(0.7f, 0.7f, 0.7f));
+                uiManager.TextFactory.Create($"Meslek: {ancestor.Occupation}", panel.transform, 14, new Color(0.6f, 0.6f, 0.8f));
+                uiManager.TextFactory.Create($"Servet: ₺{ancestor.NetWorth:N0}", panel.transform, 14, new Color(0.3f, 0.8f, 0.3f));
+
+                if (ancestor.Achievements.Count > 0)
+                {
+                    string achievements = string.Join(", ", ancestor.Achievements);
+                    uiManager.TextFactory.Create($"Başarılar: {achievements}", panel.transform, 12, new Color(0.8f, 0.8f, 0.3f));
+                }
+            }
+
+            // Kapat butonu
+            var closeBtn = uiManager.ButtonFactory.Create("Kapat", popup.transform, () =>
+            {
+                GameObject.Destroy(popup);
+            }, new Vector2(150, 45), new Color(0.5f, 0.3f, 0.3f));
+            closeBtn.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -360);
         }
     }
 
@@ -611,6 +743,275 @@ namespace BitLifeTR.UI
                 PetType.Parrot => parrotNames[Random.Range(0, parrotNames.Length)],
                 _ => "Dostum"
             };
+        }
+    }
+
+    /// <summary>
+    /// Miras/Nesil ekranı
+    /// </summary>
+    public class LegacyScreen : BaseScreen
+    {
+        private Transform contentParent;
+
+        public LegacyScreen(UIManager manager) : base(manager) { }
+
+        protected override void Initialize()
+        {
+            rootObject = uiManager.PanelFactory.Create("Legacy", null, null, new Color(0.08f, 0.08f, 0.12f, 1f));
+
+            var titleText = uiManager.TextFactory.Create("Aile Mirası", rootObject.transform, 36, Color.white);
+            titleText.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 380);
+
+            var scrollView = uiManager.ScrollViewFactory.Create("LegacyScroll", rootObject.transform, new Vector2(500, 550));
+            scrollView.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -20);
+            contentParent = uiManager.ScrollViewFactory.GetContent(scrollView);
+
+            var backBtn = uiManager.ButtonFactory.Create("Geri", rootObject.transform, () =>
+            {
+                uiManager.ShowScreen(ScreenType.Game);
+            }, new Vector2(150, 50), new Color(0.5f, 0.3f, 0.3f));
+            backBtn.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -380);
+        }
+
+        public override void Refresh()
+        {
+            foreach (Transform child in contentParent)
+            {
+                GameObject.Destroy(child.gameObject);
+            }
+
+            var character = GameManager.Instance.CurrentCharacter;
+            if (character == null) return;
+
+            // Nesil bilgisi
+            var genPanel = uiManager.PanelFactory.CreateWithLayout("GenInfo", new Vector2(450, 120), contentParent, true, 5);
+            genPanel.GetComponent<UnityEngine.UI.Image>().color = new Color(0.2f, 0.2f, 0.3f, 0.9f);
+
+            uiManager.TextFactory.Create($"{character.Surname} Ailesi", genPanel.transform, 24, Color.white);
+            uiManager.TextFactory.Create($"Nesil: {character.Legacy.Generation}", genPanel.transform, 18, new Color(0.6f, 0.6f, 0.8f));
+            uiManager.TextFactory.Create($"Toplam Aile Serveti: ₺{character.Legacy.TotalFamilyWealth:N0}", genPanel.transform, 16, new Color(0.3f, 0.8f, 0.3f));
+
+            // Miras aldıysa göster
+            if (character.Legacy.HasReceivedInheritance)
+            {
+                var inheritPanel = uiManager.PanelFactory.CreateWithLayout("Inherit", new Vector2(450, 80), contentParent, true, 5);
+                inheritPanel.GetComponent<UnityEngine.UI.Image>().color = new Color(0.3f, 0.3f, 0.2f, 0.9f);
+
+                uiManager.TextFactory.Create("Alınan Miras", inheritPanel.transform, 18, new Color(0.8f, 0.8f, 0.3f));
+                uiManager.TextFactory.Create($"₺{character.Legacy.InheritedAmount:N0}", inheritPanel.transform, 16, new Color(0.3f, 0.8f, 0.3f));
+            }
+
+            // Vasiyetname butonu
+            var willBtn = uiManager.ButtonFactory.Create("Vasiyetname Düzenle", contentParent, () =>
+            {
+                uiManager.ShowScreen(ScreenType.Will);
+            }, new Vector2(250, 50), new Color(0.4f, 0.4f, 0.6f));
+
+            // Atalar
+            if (character.Legacy.Ancestors.Count > 0)
+            {
+                var ancestorsLabel = uiManager.TextFactory.Create("=== Atalar ===", contentParent, 20, Color.white);
+
+                foreach (var ancestor in character.Legacy.Ancestors)
+                {
+                    var panel = uiManager.PanelFactory.CreateWithLayout("Ancestor", new Vector2(450, 100), contentParent, true, 3);
+                    panel.GetComponent<UnityEngine.UI.Image>().color = new Color(0.15f, 0.15f, 0.2f, 0.9f);
+
+                    uiManager.TextFactory.Create($"{ancestor.Name} {ancestor.Surname}", panel.transform, 18, Color.white);
+                    uiManager.TextFactory.Create($"{ancestor.BirthYear} - {ancestor.DeathYear}", panel.transform, 14, new Color(0.6f, 0.6f, 0.6f));
+                    uiManager.TextFactory.Create($"Servet: ₺{ancestor.NetWorth:N0}", panel.transform, 14, new Color(0.3f, 0.7f, 0.3f));
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Vasiyetname ekranı
+    /// </summary>
+    public class WillScreen : BaseScreen
+    {
+        private Transform contentParent;
+
+        public WillScreen(UIManager manager) : base(manager) { }
+
+        protected override void Initialize()
+        {
+            rootObject = uiManager.PanelFactory.Create("Will", null, null, new Color(0.08f, 0.08f, 0.12f, 1f));
+
+            var titleText = uiManager.TextFactory.Create("Vasiyetname", rootObject.transform, 36, Color.white);
+            titleText.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 380);
+
+            var scrollView = uiManager.ScrollViewFactory.Create("WillScroll", rootObject.transform, new Vector2(500, 500));
+            scrollView.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
+            contentParent = uiManager.ScrollViewFactory.GetContent(scrollView);
+
+            var backBtn = uiManager.ButtonFactory.Create("Geri", rootObject.transform, () =>
+            {
+                uiManager.ShowScreen(ScreenType.Legacy);
+            }, new Vector2(150, 50), new Color(0.5f, 0.3f, 0.3f));
+            backBtn.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -380);
+        }
+
+        public override void Refresh()
+        {
+            foreach (Transform child in contentParent)
+            {
+                GameObject.Destroy(child.gameObject);
+            }
+
+            var character = GameManager.Instance.CurrentCharacter;
+            if (character == null) return;
+
+            var legacySystem = GameManager.Instance.LegacySystem;
+            float netWorth = legacySystem.CalculateNetWorth(character);
+
+            // Net servet bilgisi
+            var worthText = uiManager.TextFactory.Create($"Net Servetiniz: ₺{netWorth:N0}", contentParent, 20, new Color(0.3f, 0.8f, 0.3f));
+
+            // Tahmini vergi
+            float tax = legacySystem.CalculateInheritanceTax(netWorth);
+            uiManager.TextFactory.Create($"Tahmini Miras Vergisi: ₺{tax:N0}", contentParent, 16, new Color(0.8f, 0.5f, 0.3f));
+
+            // Mevcut vasiyetname durumu
+            if (character.Legacy.Will.HasWill)
+            {
+                var statusPanel = uiManager.PanelFactory.CreateWithLayout("Status", new Vector2(450, 100), contentParent, true, 5);
+                statusPanel.GetComponent<UnityEngine.UI.Image>().color = new Color(0.2f, 0.3f, 0.2f, 0.9f);
+
+                uiManager.TextFactory.Create("Vasiyetname Mevcut", statusPanel.transform, 18, new Color(0.3f, 0.8f, 0.3f));
+                uiManager.TextFactory.Create($"Son Güncelleme: {character.Legacy.Will.LastUpdatedYear}", statusPanel.transform, 14, new Color(0.6f, 0.6f, 0.6f));
+                uiManager.TextFactory.Create($"Dağıtım: {GetDistributionName(character.Legacy.Will.DistributionType)}", statusPanel.transform, 14, Color.white);
+            }
+            else
+            {
+                uiManager.TextFactory.Create("Henüz vasiyetname oluşturmadınız.", contentParent, 16, new Color(0.8f, 0.5f, 0.5f));
+            }
+
+            // Dağıtım seçenekleri
+            uiManager.TextFactory.Create("=== Dağıtım Şekli ===", contentParent, 18, Color.white);
+
+            // Eşit dağıtım butonu
+            var equalBtn = uiManager.ButtonFactory.Create("Eşit Dağıt", contentParent, () =>
+            {
+                GameManager.Instance.LegacySystem.CreateDefaultWill(character);
+                uiManager.ShowPopup("Vasiyetname", "Vasiyetnameniz eşit dağıtım olarak güncellendi.", null, null);
+                Refresh();
+            }, new Vector2(250, 45), new Color(0.3f, 0.5f, 0.6f));
+
+            // İlk çocuğa
+            var firstChildBtn = uiManager.ButtonFactory.Create("İlk Çocuğa Bırak", contentParent, () =>
+            {
+                CreateFirstChildWill(character);
+                Refresh();
+            }, new Vector2(250, 45), new Color(0.5f, 0.4f, 0.6f));
+
+            // Eşe bırak
+            var spouseBtn = uiManager.ButtonFactory.Create("Eşe Bırak", contentParent, () =>
+            {
+                CreateSpouseWill(character);
+                Refresh();
+            }, new Vector2(250, 45), new Color(0.6f, 0.4f, 0.5f));
+
+            // Hayır kurumuna
+            var charityBtn = uiManager.ButtonFactory.Create("Hayır Kurumuna (%20)", contentParent, () =>
+            {
+                CreateCharityWill(character, 20);
+                Refresh();
+            }, new Vector2(250, 45), new Color(0.4f, 0.6f, 0.4f));
+        }
+
+        private string GetDistributionName(WillDistribution dist)
+        {
+            return dist switch
+            {
+                WillDistribution.Equal => "Eşit",
+                WillDistribution.Custom => "Özel",
+                WillDistribution.FirstChild => "İlk Çocuk",
+                WillDistribution.Spouse => "Eş",
+                WillDistribution.Charity => "Hayır Kurumu",
+                _ => "Bilinmiyor"
+            };
+        }
+
+        private void CreateFirstChildWill(CharacterData character)
+        {
+            var children = character.Relationships.FindAll(r => r.IsAlive && r.RelationType == RelationType.Child);
+            if (children.Count == 0)
+            {
+                uiManager.ShowPopup("Hata", "Çocuğunuz bulunmuyor.", null, null);
+                return;
+            }
+
+            var firstChild = children[0];
+            var beneficiaries = new System.Collections.Generic.List<WillBeneficiary>
+            {
+                new WillBeneficiary
+                {
+                    RelationshipId = firstChild.Id,
+                    Name = firstChild.Name,
+                    RelationType = RelationType.Child,
+                    Percentage = 100
+                }
+            };
+
+            GameManager.Instance.LegacySystem.CreateOrUpdateWill(character, WillDistribution.FirstChild, beneficiaries);
+            uiManager.ShowPopup("Vasiyetname", $"Mirasınız {firstChild.Name}'a bırakıldı.", null, null);
+        }
+
+        private void CreateSpouseWill(CharacterData character)
+        {
+            var spouse = character.Relationships.Find(r => r.IsAlive && r.RelationType == RelationType.Spouse);
+            if (spouse == null)
+            {
+                uiManager.ShowPopup("Hata", "Eşiniz bulunmuyor.", null, null);
+                return;
+            }
+
+            var beneficiaries = new System.Collections.Generic.List<WillBeneficiary>
+            {
+                new WillBeneficiary
+                {
+                    RelationshipId = spouse.Id,
+                    Name = spouse.Name,
+                    RelationType = RelationType.Spouse,
+                    Percentage = 100
+                }
+            };
+
+            GameManager.Instance.LegacySystem.CreateOrUpdateWill(character, WillDistribution.Spouse, beneficiaries);
+            uiManager.ShowPopup("Vasiyetname", $"Mirasınız eşiniz {spouse.Name}'a bırakıldı.", null, null);
+        }
+
+        private void CreateCharityWill(CharacterData character, float charityPercentage)
+        {
+            var beneficiaries = new System.Collections.Generic.List<WillBeneficiary>();
+            var livingFamily = character.Relationships.FindAll(r => r.IsAlive &&
+                (r.RelationType == RelationType.Spouse || r.RelationType == RelationType.Child));
+
+            float remainingPercentage = 100 - charityPercentage;
+            if (livingFamily.Count > 0)
+            {
+                float perPerson = remainingPercentage / livingFamily.Count;
+                foreach (var family in livingFamily)
+                {
+                    beneficiaries.Add(new WillBeneficiary
+                    {
+                        RelationshipId = family.Id,
+                        Name = family.Name,
+                        RelationType = family.RelationType,
+                        Percentage = perPerson
+                    });
+                }
+            }
+
+            GameManager.Instance.LegacySystem.CreateOrUpdateWill(
+                character,
+                WillDistribution.Charity,
+                beneficiaries,
+                charityPercentage,
+                "Türk Kızılayı"
+            );
+            uiManager.ShowPopup("Vasiyetname", $"Mirasınızın %{charityPercentage}'i hayır kurumuna bağışlanacak.", null, null);
         }
     }
 }

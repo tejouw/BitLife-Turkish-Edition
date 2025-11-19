@@ -87,6 +87,8 @@ namespace BitLifeTR.UI
             screens[ScreenType.GameOver] = new GameOverScreen(this);
             screens[ScreenType.Event] = new EventScreen(this);
             screens[ScreenType.Pets] = new PetsScreen(this);
+            screens[ScreenType.Legacy] = new LegacyScreen(this);
+            screens[ScreenType.Will] = new WillScreen(this);
 
             // Tüm ekranları gizle
             foreach (var screen in screens.Values)

@@ -91,7 +91,9 @@ namespace BitLifeTR.Core
         Settings,
         GameOver,
         Event,
-        Pets
+        Pets,
+        Legacy,
+        Will
     }
 
     /// <summary>
@@ -254,5 +256,17 @@ namespace BitLifeTR.Core
         Common,         // Yaygın
         Exotic,         // Egzotik
         Aquatic         // Su hayvanı
+    }
+
+    /// <summary>
+    /// Vasiyetname dağıtım tipleri
+    /// </summary>
+    public enum WillDistribution
+    {
+        Equal,          // Eşit dağıtım
+        Custom,         // Özel dağıtım
+        FirstChild,     // İlk çocuğa
+        Spouse,         // Eşe
+        Charity         // Hayır kurumuna
     }
 }
