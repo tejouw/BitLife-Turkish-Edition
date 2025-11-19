@@ -48,6 +48,9 @@ namespace BitLifeTR.Data
         // Evcil hayvanlar
         public List<PetData> Pets;
 
+        // Miras sistemi
+        public LegacyData Legacy;
+
         public CharacterData()
         {
             Id = Guid.NewGuid().ToString();
@@ -61,6 +64,7 @@ namespace BitLifeTR.Data
             LifeEvents = new List<string>();
             Military = new MilitaryData();
             Pets = new List<PetData>();
+            Legacy = new LegacyData();
         }
 
         public CharacterData(string name, Gender gender) : this()
@@ -494,6 +498,114 @@ namespace BitLifeTR.Data
                 PetType.Parrot => "Papağan",
                 _ => "Hayvan"
             };
+        }
+    }
+
+    /// <summary>
+    /// Miras ve nesil verisi
+    /// </summary>
+    [Serializable]
+    public class LegacyData
+    {
+        // Nesil bilgisi
+        public int Generation;
+        public string FamilyName;
+        public float TotalFamilyWealth;
+        public int TotalFamilyMembers;
+        public List<string> FamilyHistory;
+
+        // Önceki karakterler
+        public List<AncestorData> Ancestors;
+
+        // Vasiyetname
+        public WillData Will;
+
+        // Miras durumu
+        public bool HasReceivedInheritance;
+        public float InheritedAmount;
+        public List<AssetData> InheritedAssets;
+
+        public LegacyData()
+        {
+            Generation = 1;
+            FamilyName = "";
+            TotalFamilyWealth = 0;
+            TotalFamilyMembers = 1;
+            FamilyHistory = new List<string>();
+            Ancestors = new List<AncestorData>();
+            Will = new WillData();
+            HasReceivedInheritance = false;
+            InheritedAmount = 0;
+            InheritedAssets = new List<AssetData>();
+        }
+    }
+
+    /// <summary>
+    /// Ata/Önceki karakter verisi
+    /// </summary>
+    [Serializable]
+    public class AncestorData
+    {
+        public string Id;
+        public string Name;
+        public string Surname;
+        public Gender Gender;
+        public int BirthYear;
+        public int DeathYear;
+        public int DeathAge;
+        public DeathReason DeathReason;
+        public float NetWorth;
+        public string Occupation;
+        public int ChildrenCount;
+        public List<string> Achievements;
+
+        public AncestorData()
+        {
+            Id = Guid.NewGuid().ToString();
+            Achievements = new List<string>();
+        }
+    }
+
+    /// <summary>
+    /// Vasiyetname verisi
+    /// </summary>
+    [Serializable]
+    public class WillData
+    {
+        public bool HasWill;
+        public WillDistribution DistributionType;
+        public List<WillBeneficiary> Beneficiaries;
+        public float CharityPercentage;
+        public string CharityName;
+        public string SpecialInstructions;
+        public int LastUpdatedYear;
+
+        public WillData()
+        {
+            HasWill = false;
+            DistributionType = WillDistribution.Equal;
+            Beneficiaries = new List<WillBeneficiary>();
+            CharityPercentage = 0;
+            CharityName = "";
+            SpecialInstructions = "";
+        }
+    }
+
+    /// <summary>
+    /// Vasiyetname lehdarı
+    /// </summary>
+    [Serializable]
+    public class WillBeneficiary
+    {
+        public string RelationshipId;
+        public string Name;
+        public RelationType RelationType;
+        public float Percentage;
+        public List<string> SpecificAssets; // Belirli varlıklar
+
+        public WillBeneficiary()
+        {
+            SpecificAssets = new List<string>();
         }
     }
 }
